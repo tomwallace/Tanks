@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour
 {
@@ -11,7 +12,8 @@ public class GameManager : MonoBehaviour
     public CameraControl m_CameraControl;   
     public Text m_MessageText;              
     public GameObject m_TankPrefab;         
-    public TankManager[] m_Tanks;           
+    public TankManager[] m_Tanks;
+    public Transform[] m_SpawnPoints;
 
 
     private int m_RoundNumber;              
@@ -35,13 +37,27 @@ public class GameManager : MonoBehaviour
 
     private void SpawnAllTanks()
     {
+        List<Transform> usedTransforms = new List<Transform>();
         for (int i = 0; i < m_Tanks.Length; i++)
         {
+            Transform spawnPoint = null;
+            do
+            {
+                spawnPoint = GetRandomSpawnPoint();
+            } while (usedTransforms.Contains(spawnPoint));
+
+            usedTransforms.Add(spawnPoint);
+
             m_Tanks[i].m_Instance =
-                Instantiate(m_TankPrefab, m_Tanks[i].m_SpawnPoint.position, m_Tanks[i].m_SpawnPoint.rotation) as GameObject;
+                Instantiate(m_TankPrefab, spawnPoint.position, spawnPoint.rotation) as GameObject;
             m_Tanks[i].m_PlayerNumber = i + 1;
             m_Tanks[i].Setup();
         }
+    }
+
+    private Transform GetRandomSpawnPoint()
+    {
+        return m_SpawnPoints[Random.Range(0, m_SpawnPoints.Length - 1)];
     }
 
 
@@ -179,9 +195,18 @@ public class GameManager : MonoBehaviour
 
     private void ResetAllTanks()
     {
+        List<Transform> usedTransforms = new List<Transform>();
         for (int i = 0; i < m_Tanks.Length; i++)
         {
-            m_Tanks[i].Reset();
+            Transform spawnPoint = null;
+            do
+            {
+                spawnPoint = GetRandomSpawnPoint();
+            } while (usedTransforms.Contains(spawnPoint));
+
+            usedTransforms.Add(spawnPoint);
+
+            m_Tanks[i].Reset(spawnPoint);
         }
     }
 

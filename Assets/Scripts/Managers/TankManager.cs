@@ -4,8 +4,7 @@ using UnityEngine;
 [Serializable]
 public class TankManager
 {
-    public Color m_PlayerColor;            
-    public Transform m_SpawnPoint;         
+    public Color m_PlayerColor;      
     [HideInInspector] public int m_PlayerNumber;             
     [HideInInspector] public string m_ColoredPlayerText;
     [HideInInspector] public GameObject m_Instance;          
@@ -55,10 +54,10 @@ public class TankManager
     }
 
 
-    public void Reset()
+    public void Reset(Transform spawnPoint)
     {
-        m_Instance.transform.position = m_SpawnPoint.position;
-        m_Instance.transform.rotation = m_SpawnPoint.rotation;
+        m_Instance.transform.position = spawnPoint.position;
+        m_Instance.transform.rotation = spawnPoint.rotation;
 
         m_Instance.SetActive(false);
         m_Instance.SetActive(true);

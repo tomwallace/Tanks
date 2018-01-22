@@ -1,27 +1,36 @@
-﻿using UnityEngine;
+﻿using Assets.Scripts.Managers;
 using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour
 {
-    public int m_NumRoundsToWin = 5;        
-    public float m_StartDelay = 3f;         
-    public float m_EndDelay = 3f;           
-    public CameraControl m_CameraControl;   
-    public Text m_MessageText;              
-    public GameObject m_TankPrefab;         
+    public int m_NumRoundsToWin = 5;
+    public float m_StartDelay = 3f;
+    public float m_EndDelay = 3f;
+    public CameraControl m_CameraControl;
+    public Text m_MessageText;
+    public GameObject m_TankPrefab;
     public TankManager[] m_Tanks;
     public Transform[] m_SpawnPoints;
+    public SpawnPointManager m_SpawnPointManager;
 
-
-    private int m_RoundNumber;              
-    private WaitForSeconds m_StartWait;     
-    private WaitForSeconds m_EndWait;       
+    private int m_RoundNumber;
+    private WaitForSeconds m_StartWait;
+    private WaitForSeconds m_EndWait;
     private TankManager m_RoundWinner;
-    private TankManager m_GameWinner;       
+    private TankManager m_GameWinner;
 
+    public IEnumerator SetMessageText(string text)
+    {
+        m_MessageText.text = text;
+
+        yield return new WaitForSeconds(2f);
+
+        m_MessageText.text = "";
+    }
 
     private void Start()
     {
@@ -34,7 +43,6 @@ public class GameManager : MonoBehaviour
         StartCoroutine(GameLoop());
     }
 
-
     private void SpawnAllTanks()
     {
         List<Transform> usedTransforms = new List<Transform>();
@@ -43,7 +51,7 @@ public class GameManager : MonoBehaviour
             Transform spawnPoint = null;
             do
             {
-                spawnPoint = GetRandomSpawnPoint();
+                spawnPoint = m_SpawnPointManager.GetRandomSpawnPoint();
             } while (usedTransforms.Contains(spawnPoint));
 
             usedTransforms.Add(spawnPoint);
@@ -54,12 +62,6 @@ public class GameManager : MonoBehaviour
             m_Tanks[i].Setup();
         }
     }
-
-    private Transform GetRandomSpawnPoint()
-    {
-        return m_SpawnPoints[Random.Range(0, m_SpawnPoints.Length - 1)];
-    }
-
 
     private void SetCameraTargets()
     {
@@ -72,7 +74,6 @@ public class GameManager : MonoBehaviour
 
         m_CameraControl.m_Targets = targets;
     }
-
 
     private IEnumerator GameLoop()
     {
@@ -90,7 +91,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-
     private IEnumerator RoundStarting()
     {
         ResetAllTanks();
@@ -104,18 +104,16 @@ public class GameManager : MonoBehaviour
         yield return m_StartWait;
     }
 
-
     private IEnumerator RoundPlaying()
     {
         EnableTankControl();
         m_MessageText.text = "";
 
-        while(!OneTankLeft())
+        while (!OneTankLeft())
         {
             yield return null;
         }
     }
-
 
     private IEnumerator RoundEnding()
     {
@@ -134,7 +132,6 @@ public class GameManager : MonoBehaviour
 
         yield return m_EndWait;
     }
-
 
     private bool OneTankLeft()
     {
@@ -160,7 +157,6 @@ public class GameManager : MonoBehaviour
         return null;
     }
 
-
     private TankManager GetGameWinner()
     {
         for (int i = 0; i < m_Tanks.Length; i++)
@@ -171,7 +167,6 @@ public class GameManager : MonoBehaviour
 
         return null;
     }
-
 
     private string EndMessage()
     {
@@ -201,7 +196,7 @@ public class GameManager : MonoBehaviour
             Transform spawnPoint = null;
             do
             {
-                spawnPoint = GetRandomSpawnPoint();
+                spawnPoint = m_SpawnPointManager.GetRandomSpawnPoint();
             } while (usedTransforms.Contains(spawnPoint));
 
             usedTransforms.Add(spawnPoint);
@@ -210,7 +205,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-
     private void EnableTankControl()
     {
         for (int i = 0; i < m_Tanks.Length; i++)
@@ -218,7 +212,6 @@ public class GameManager : MonoBehaviour
             m_Tanks[i].EnableControl();
         }
     }
-
 
     private void DisableTankControl()
     {

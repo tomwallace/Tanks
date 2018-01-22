@@ -13,8 +13,13 @@ public class TankHealth : MonoBehaviour
     private AudioSource m_ExplosionAudio;          
     private ParticleSystem m_ExplosionParticles;   
     private float m_CurrentHealth;  
-    private bool m_Dead;            
+    private bool m_Dead;
+    private bool m_isShielded;
 
+    public void SetIsShielded(bool isShielded)
+    {
+        m_isShielded = isShielded;
+    }
 
     private void Awake()
     {
@@ -29,12 +34,15 @@ public class TankHealth : MonoBehaviour
     {
         m_CurrentHealth = m_StartingHealth;
         m_Dead = false;
+        m_isShielded = false;
 
         SetHealthUI();
     }
 
     public void TakeDamage(float amount)
     {
+        amount = m_isShielded ? amount * 0.1f : amount;
+
         // Adjust the tank's current health, update the UI based on the new health and check whether or not the tank is dead.
         m_CurrentHealth -= amount;
 
@@ -59,6 +67,7 @@ public class TankHealth : MonoBehaviour
     {
         // Play the effects for the death of the tank and deactivate it.
         m_Dead = true;
+        m_isShielded = false;
 
         m_ExplosionParticles.transform.position = transform.position;
         m_ExplosionParticles.gameObject.SetActive(true);

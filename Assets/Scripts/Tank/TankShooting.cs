@@ -4,7 +4,7 @@ using UnityEngine.UI;
 public class TankShooting : MonoBehaviour
 {
     public int m_PlayerNumber = 1;       
-    public Rigidbody m_Shell;            
+    public Rigidbody m_NormalShell;
     public Transform m_FireTransform;    
     public Slider m_AimSlider;           
     public AudioSource m_ShootingAudio;  
@@ -14,16 +14,27 @@ public class TankShooting : MonoBehaviour
     public float m_MaxLaunchForce = 30f; 
     public float m_MaxChargeTime = 0.75f;
 
+    private Rigidbody m_ShellEnabled;
     private string m_FireButton;         
     private float m_CurrentLaunchForce;  
     private float m_ChargeSpeed;         
-    private bool m_Fired;                
+    private bool m_Fired;
 
+    public void SetShellRigidBody(Rigidbody shellRigidBody)
+    {
+        m_ShellEnabled = shellRigidBody;
+    }
+
+    public void EnableDefaultShellRigidBody()
+    {
+        m_ShellEnabled = m_NormalShell;
+    }
 
     private void OnEnable()
     {
         m_CurrentLaunchForce = m_MinLaunchForce;
         m_AimSlider.value = m_MinLaunchForce;
+        m_ShellEnabled = m_NormalShell;
     }
 
 
@@ -73,7 +84,7 @@ public class TankShooting : MonoBehaviour
         // Instantiate and launch the shell.
         m_Fired = true;
 
-        Rigidbody shellInstance = Instantiate(m_Shell, m_FireTransform.position, m_FireTransform.rotation) as Rigidbody;
+        Rigidbody shellInstance = Instantiate(m_ShellEnabled, m_FireTransform.position, m_FireTransform.rotation) as Rigidbody;
         shellInstance.velocity = m_CurrentLaunchForce * m_FireTransform.forward;
 
         m_ShootingAudio.clip = m_FireClip;
